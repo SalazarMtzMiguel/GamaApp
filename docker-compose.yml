@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  backend:
+    build: ./backend
+    container_name: django_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./backend/db.sqlite3:/app/db.sqlite3  # Para que el archivo SQLite sea persistente
+    depends_on:
+      - frontend
+    networks:
+      - my_network  # Conecta a la red
+
+  frontend:
+    build: ./frontend
+    container_name: vue_frontend
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./frontend:/app
+      - frontend_dist:/app/dist  # Monta un volumen para la carpeta dist
+    networks:
+      - my_network  # Conecta a la red
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_server
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - frontend_dist:/usr/share/nginx/html  # Usa el mismo volumen para Nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - my_network  # Conecta a la red
+
+  gama:
+    image: gamaplatform/gama:1.9.3  # Cambia <version> por la versión que necesites
+    container_name: gama_headless
+    restart: always
+    volumes:
+      - ./gama:/working_dir  # Asegúrate de que tus scripts estén en ./gama
+    ports:
+      - "6868:6868"
+    command: ["-socket", "6868"]
+    networks:
+      - my_network  # Conecta a la red
+
+volumes:
+  frontend_dist:  # Define el volumen para la carpeta dist
+
+networks:
+  my_network:  # Define la red
