@@ -1,0 +1,40 @@
+{
+    "name": "GamaApp",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "backend",
+    "workspaceFolder": "/app",
+    "shutdownAction": "stopCompose",
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "python.pythonPath": "/usr/local/bin/python"
+    },
+    "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "octref.vetur"
+    ],
+    "postCreateCommand": "pip install -r requirements.txt",
+    "remoteEnv": {
+        "DJANGO_SETTINGS_MODULE": "backend.settings"
+    },
+    "portsAttributes": {
+        "8000": {
+            "label": "Django",
+            "onAutoForward": "notify"
+        },
+        "8080": {
+            "label": "Vue.js",
+            "onAutoForward": "notify"
+        },
+        "80": {
+            "label": "Nginx",
+            "onAutoForward": "notify"
+        },
+        "6868": {
+            "label": "Gama",
+            "onAutoForward": "notify"
+        }
+    }
+}

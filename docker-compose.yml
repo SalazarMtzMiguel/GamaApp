@@ -4,7 +4,7 @@ services:
   backend:
     build: ./backend
     container_name: django_backend
-    restart: always
+    restart: unless-stopped
     ports:
       - "8000:8000"
     volumes:
@@ -18,7 +18,7 @@ services:
   frontend:
     build: ./frontend
     container_name: vue_frontend
-    restart: always
+    restart: unless-stopped
     ports:
       - "8080:8080"
     volumes:
@@ -30,7 +30,7 @@ services:
   nginx:
     image: nginx:alpine
     container_name: nginx_server
-    restart: always
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
@@ -44,7 +44,7 @@ services:
   gama:
     image: gamaplatform/gama:1.9.3  # Cambia <version> por la versión que necesites
     container_name: gama_headless
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./gama:/working_dir  # Asegúrate de que tus scripts estén en ./gama
     ports:
