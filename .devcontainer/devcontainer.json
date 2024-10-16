@@ -9,11 +9,17 @@
         "python.pythonPath": "/usr/local/bin/python"
     },
     "extensions": [
-        "ms-python.python",
-        "ms-azuretools.vscode-docker",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "octref.vetur"
+        "ms-python.python",                // Extensión básica para Python
+        "ms-azuretools.vscode-docker",     // Soporte para Docker
+        "dbaeumer.vscode-eslint",          // Linter para JavaScript y Vue
+        "esbenp.prettier-vscode",          // Prettier para el formateo de código
+        "octref.vetur",                    // Soporte para Vue.js
+        "batisteo.vscode-django",          // Extensión para soporte específico de Django
+        "KevinRose.vsc-python-indent",     // Mejora el indentado de Python
+        "koxudaxi.pydantic",               // Soporte para Pydantic, si usas validaciones en modelos
+        "njpwerner.autodocstring",         // Autogenera docstrings para funciones Python
+        "charliermarsh.ruff",              // Linter rápido para Python (alternativa a pylint)
+        "littlefoxteam.vscode-python-test-adapter" // Integración para tests en Python
     ],
     "postCreateCommand": "pip install -r requirements.txt",
     "remoteEnv": {
