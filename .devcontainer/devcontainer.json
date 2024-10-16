@@ -9,29 +9,29 @@
         "python.pythonPath": "/usr/local/bin/python"
     },
     "extensions": [
-        "ms-python.python",                // Extensión básica para Python
-        "ms-azuretools.vscode-docker",     // Soporte para Docker
-        "dbaeumer.vscode-eslint",          // Linter para JavaScript y Vue
-        "esbenp.prettier-vscode",          // Prettier para el formateo de código
-        "octref.vetur",                    // Soporte para Vue.js
-        "batisteo.vscode-django",          // Extensión para soporte específico de Django
-        "KevinRose.vsc-python-indent",     // Mejora el indentado de Python
-        "koxudaxi.pydantic",               // Soporte para Pydantic, si usas validaciones en modelos
-        "njpwerner.autodocstring",         // Autogenera docstrings para funciones Python
-        "charliermarsh.ruff",              // Linter rápido para Python (alternativa a pylint)
-        "littlefoxteam.vscode-python-test-adapter" // Integración para tests en Python
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "batisteo.vscode-django",
+        "KevinRose.vsc-python-indent",
+        "koxudaxi.pydantic",
+        "njpwerner.autodocstring",
+        "charliermarsh.ruff",
+        "littlefoxteam.vscode-python-test-adapter"
     ],
     "postCreateCommand": "pip install -r requirements.txt",
     "remoteEnv": {
-        "DJANGO_SETTINGS_MODULE": "backend.settings"
+        "DJANGO_SETTINGS_MODULE": "backend.settings",
+        "POSTGRES_DB": "my_database",
+        "POSTGRES_USER": "my_user",
+        "POSTGRES_PASSWORD": "my_password",
+        "POSTGRES_HOST": "postgres",
+        "POSTGRES_PORT": "5432"
     },
     "portsAttributes": {
         "8000": {
             "label": "Django",
-            "onAutoForward": "notify"
-        },
-        "8080": {
-            "label": "Vue.js",
             "onAutoForward": "notify"
         },
         "80": {
@@ -40,6 +40,10 @@
         },
         "6868": {
             "label": "Gama",
+            "onAutoForward": "notify"
+        },
+        "5432": {
+            "label": "PostgreSQL",
             "onAutoForward": "notify"
         }
     }

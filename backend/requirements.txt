@@ -1,24 +1,27 @@
 # Django framework
-Django>=3.2,<4.0
+Django>=4.2,<5.1
 
 # Django REST Framework for building APIs
-djangorestframework>=3.12,<4.0
+djangorestframework>=3.14  # O la última versión estable
 
-# Gunicorn for serving your app in production
-gunicorn
+markdown
+
+django-filter
+
+# Gunicorn for serving your app in producción
+gunicorn>=20.1,<21.0
 
 # NumPy for numerical operations
 numpy>=1.21,<2.0
 
 # Matplotlib for plotting and visualization
-matplotlib>=3.4,<4.0
+matplotlib>=3.5,<4.0
 
 # SciPy for scientific computations
 scipy>=1.7,<2.0
 
 # Pandas for data manipulation and analysis
-pandas>=1.3,<2.0
+pandas>=1.3,<1.6
 
-# Other libraries as needed
-# For example, if you need to perform data analysis or manipulation
-seaborn>=0.11,<1.0  # Optional, for statistical data visualization
+# Seaborn for statistical data visualization
+seaborn>=0.11
