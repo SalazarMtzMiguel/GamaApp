@@ -10,26 +10,31 @@ services:
     depends_on:
       - postgres
     environment:
-      - POSTGRES_DB=my_database
-      - POSTGRES_USER=my_user
-      - POSTGRES_PASSWORD=my_password
-      - DATABASE_URL=postgres://my_user:my_password@postgres:5432/my_database
+      - POSTGRES_DB=bd
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=12345678
+      - DATABASE_URL=postgres://admin:12345678@postgres:5432/db
     networks:
       - my_network
     command: ["gunicorn", "--bind", "0.0.0.0:8000", "GamaBackend.wsgi:application"]  # Reemplaza 'your_project_name' por el nombre de tu proyecto Django
 
   postgres:
-    image: postgres:13
+    image: postgres:15
     container_name: postgres_db
     restart: unless-stopped
     environment:
-      - POSTGRES_DB=my_database
-      - POSTGRES_USER=my_user
-      - POSTGRES_PASSWORD=my_password
+      - POSTGRES_DB=db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=12345678
     volumes:
       - ./database:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - my_network
 
