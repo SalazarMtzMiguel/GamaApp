@@ -6,21 +6,21 @@
     "shutdownAction": "stopCompose",
     "settings": {
         "python.pythonPath": "/usr/local/bin/python",
-        "editor.formatOnSave": true, // Formatear automáticamente al guardar
-        "prettier.requireConfig": true // Requiere un archivo de configuración de Prettier
+        "editor.formatOnSave": true,
+        "prettier.requireConfig": true
     },
     "extensions": [
-        "ms-python.python",                // Extensión básica para Python
-        "ms-azuretools.vscode-docker",     // Soporte para Docker
-        "dbaeumer.vscode-eslint",          // Linter para JavaScript y Vue
-        "esbenp.prettier-vscode",          // Prettier para el formateo de código
-        "batisteo.vscode-django",          // Soporte para desarrollo de Django
-        "KevinRose.vsc-python-indent",     // Mejora el indentado de Python
-        "koxudaxi.pydantic",               // Soporte para Pydantic, si se usa
-        "njpwerner.autodocstring",         // Autogenera docstrings para funciones Python
-        "charliermarsh.ruff",              // Linter rápido para Python
-        "littlefoxteam.vscode-python-test-adapter", // Integración para tests en Python
-        "cstrap.prettier-pack"             // Pack de extensiones para Prettier
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "batisteo.vscode-django",
+        "KevinRose.vsc-python-indent",
+        "koxudaxi.pydantic",
+        "njpwerner.autodocstring",
+        "charliermarsh.ruff",
+        "littlefoxteam.vscode-python-test-adapter",
+        "cstrap.prettier-pack"
     ],
     "postCreateCommand": "pip install -r requirements.txt",
     "remoteEnv": {
