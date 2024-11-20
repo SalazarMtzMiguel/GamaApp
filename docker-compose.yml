@@ -10,36 +10,34 @@ services:
     depends_on:
       - postgres
     environment:
-      - POSTGRES_DB=bd
+      - POSTGRES_DB=gama_database
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=12345678
-      - DATABASE_URL=postgres://admin:12345678@postgres:5432/db
+      - DATABASE_URL=postgres://admin:12345678@postgres:5432/gama_database
     networks:
       - my_network
-    command: ["gunicorn", "--bind", "0.0.0.0:8000", "GamaBackend.wsgi:application"]  # Reemplaza 'your_project_name' por el nombre de tu proyecto Django
+    command: >
+      sh -c ". /app/venv/bin/activate &&
+             python manage.py migrate &&
+             gunicorn --bind 0.0.0.0:8000 GamaBackend.wsgi:application"
 
   postgres:
     image: postgres:15
     container_name: postgres_db
     restart: unless-stopped
     environment:
-      - POSTGRES_DB=db
+      - POSTGRES_DB=gama_database
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=12345678
     volumes:
       - ./database:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
     networks:
       - my_network
 
   nginx:
-    image: nginx:alpine
+    build: ./nginx
     container_name: nginx_server
     restart: unless-stopped
     ports:
@@ -52,7 +50,7 @@ services:
       - my_network
 
   gama:
-    image: gamaplatform/gama:1.9.3
+    build: ./gama
     container_name: gama_headless
     restart: unless-stopped
     volumes:
