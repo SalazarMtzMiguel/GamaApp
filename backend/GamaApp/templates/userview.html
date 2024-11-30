@@ -1,0 +1,117 @@
+{% {% extends "base.html" %}%}
+{% block content %}
+<style>
+    .header {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .header .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    .main {
+      padding: 20px;
+    }
+    .category {
+      margin-bottom: 20px;
+    }
+    .models {
+      display: none; /* Ocultar por defecto */
+      margin-top: 10px;
+    }
+    .model-description {
+      display: none; /* Ocultar descripción por defecto */
+      margin-top: 5px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+  </style>
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Menú Inicial</h1>
+    <!-- Botón para cerrar sesión -->
+    <form action="index.html" method="GET" style="display:inline;">
+      <button type="submit" class="btn btn-danger logout-btn">Cerrar Sesión</button>
+    </form>
+  </header>
+
+  <!-- Main content -->
+  <main class="main container">
+    <section class="categories">
+      <h2 class="mb-4">Categorías</h2>
+
+      <!-- Categoría Mobility -->
+      <div class="category card">
+        <div class="card-header">
+          <button class="btn btn-link category-btn text-decoration-none" type="button">Mobility</button>
+        </div>
+        <div class="card-body models">
+          <div class="model mb-3">
+            <span class="fw-bold">Model 1</span>
+            <form action="simulacion.html" method="GET" style="display:inline;">
+              <button type="submit" class="btn btn-primary btn-sm run-btn">Correr</button>
+            </form>
+            <button class="btn btn-info btn-sm details-btn" onclick="toggleDetails(this)">Detalles</button>
+            <p class="model-description">Descripción breve del Modelo 1.</p>
+          </div>
+          <div class="model mb-3">
+            <span class="fw-bold">Model 2</span>
+            <form action="simulacion.html" method="GET" style="display:inline;">
+              <button type="submit" class="btn btn-primary btn-sm run-btn">Correr</button>
+            </form>
+            <button class="btn btn-info btn-sm details-btn" onclick="toggleDetails(this)">Detalles</button>
+            <p class="model-description">Descripción breve del Modelo 2.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categoría Agrotech -->
+      <div class="category card">
+        <div class="card-header">
+          <button class="btn btn-link category-btn text-decoration-none" type="button">Agrotech</button>
+        </div>
+        <div class="card-body models">
+          <div class="model mb-3">
+            <span class="fw-bold">Model 1</span>
+            <form action="simulacion.html" method="GET" style="display:inline;">
+              <button type="submit" class="btn btn-primary btn-sm run-btn">Correr</button>
+            </form>
+            <button class="btn btn-info btn-sm details-btn" onclick="toggleDetails(this)">Detalles</button>
+            <p class="model-description">Descripción breve del Modelo 1.</p>
+          </div>
+          <div class="model mb-3">
+            <span class="fw-bold">Model 2</span>
+            <form action="simulacion.html" method="GET" style="display:inline;">
+              <button type="submit" class="btn btn-primary btn-sm run-btn">Correr</button>
+            </form>
+            <button class="btn btn-info btn-sm details-btn" onclick="toggleDetails(this)">Detalles</button>
+            <p class="model-description">Descripción breve del Modelo 2.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Función para mostrar/ocultar descripción de un modelo
+    function toggleDetails(button) {
+      const description = button.nextElementSibling;
+      description.style.display = description.style.display === "block" ? "none" : "block";
+    }
+
+    // Función para desplegar/ocultar categorías
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const models = btn.closest('.card').querySelector('.models');
+        models.style.display = models.style.display === "block" ? "none" : "block";
+      });
+    });
+  </script>
+{% endblock%}

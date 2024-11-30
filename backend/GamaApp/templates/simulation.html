@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block content%}
+<style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .header {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      position: relative;
+      text-align: center;
+    }
+    .logout-btn {
+      position: absolute;
+      top:  10px;
+      right: 10px;
+    }
+    .simulation-container {
+      padding: 20px;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .main-simulation {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .simulation-area {
+      flex: 1;
+      min-width: 300px;
+      background-color: #f8f9fa;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid #dee2e6;
+    }
+    .graph-container {
+      flex: 1;
+      min-width: 300px;
+      background-color: #f8f9fa;
+      padding: 20px;
+      border: 1px solid #dee2e6;
+    }
+    .sliders {
+      margin-top: 20px;
+    }
+    .sliders label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .slider-value {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #007bff;
+      margin-left: 10px;
+    }
+    .timer {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #555;
+    }
+  </style>
+  <header class="header">
+    <a href="index.html" class="btn btn-danger logout-btn">Cerrar sesión</a>
+    <h1>Modelo 1 - Simulación</h1>
+  </header>
+
+  <main class="simulation-container container">
+    <!-- Botones de control -->
+    <div class="controls">
+      <button class="btn btn-success start-btn">Iniciar</button>
+      <button class="btn btn-danger stop-btn">Parar</button>
+      <button class="btn btn-primary save-btn">Guardar</button>
+      <span class="timer">00:00:00</span>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="main-simulation">
+      <!-- Espacio de la simulación -->
+      <div class="simulation-area">
+        <p class="api-placeholder">[Espacio para simulación desde API]</p>
+      </div>
+
+      <!-- Gráfica -->
+      <div class="graph-container">
+        <canvas id="simulationGraph"></canvas>
+      </div>
+    </div>
+
+    <!-- Controles deslizantes -->
+    <div class="sliders">
+      <label for="slider1">Control 1</label>
+      <div class="d-flex align-items-center">
+        <input id="slider1" type="range" class="form-range" min="0" max="100" value="50">
+        <span id="value1" class="slider-value">50</span> <!-- Aquí se mostrará el valor -->
+      </div>
+
+      <label for="slider2">Control 2</label>
+      <div class="d-flex align-items-center">
+        <input id="slider2" type="range" class="form-range" min="0" max="100" value="50">
+        <span id="value2" class="slider-value">50</span> <!-- Aquí se mostrará el valor -->
+      </div>
+    </div>
+    
+    <!-- Botón de regreso -->
+    <div class="controls">
+      <a href="usuario.html" class="btn btn-success">Volver</a>
+    </div>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Placeholder para futuros scripts de API y gráficos
+    const canvas = document.getElementById('simulationGraph');
+    const ctx = canvas.getContext('2d');
+    
+    // Ejemplo básico de gráfico
+    ctx.fillStyle = 'lightgray';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Función para actualizar el valor de los sliders
+    document.getElementById('slider1').addEventListener('input', function() {
+      document.getElementById('value1').textContent = this.value;
+    });
+
+    document.getElementById('slider2').addEventListener('input', function() {
+      document.getElementById('value2').textContent = this.value;
+    });
+  </script>
+{%endblock%}
