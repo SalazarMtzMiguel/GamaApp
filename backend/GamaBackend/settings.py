@@ -78,11 +78,12 @@ WSGI_APPLICATION = 'GamaBackend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'gama_database'),
-        'USER': os.getenv('POSTGRES_USER', 'admin'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', '12345678'),
-        'HOST': os.getenv('POSTGRES_HOST', 'postgres'),
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        'NAME': 'gama_database',
+        'USER':  'admin',
+        'PASSWORD':  '12345678',
+        'HOST':  'postgres',
+        #'HOST':  'localhost',
+        'PORT':  '5432',
     }
 }
 

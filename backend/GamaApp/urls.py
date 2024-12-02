@@ -21,10 +21,12 @@ from GamaApp.views import *
 urlpatterns = [
     path('', my_view, name='index'),
     path('test/', my_test_view, name='test'),
-    path('register/', register, name='register'),
+    path('register/', UserRegistrationView.as_view(), name='register'),
     path('login/', login, name='login'),
     path('userview/', userview, name='userview'),
     path('simulation/', simulation, name='simulation'),
     path('addproduct/', ProductFormView.as_view(), name='addproduct'),
     path('products/', ProductListView.as_view(), name='products'),
+    path('about/', about, name='about'),
+    path('faq/', faq, name='faq'),
 ]

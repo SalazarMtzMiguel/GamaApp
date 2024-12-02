@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User, AbstractUser
 
 # Create your models here.
 
@@ -53,3 +54,29 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.description} - {self.price}"
+    
+class Simulation(models.Model):
+    name = models.CharField(max_length=100)
+    file = models.FileField(upload_to='simulations/')
+    users_with_access = models.ManyToManyField(User, related_name='allowed_simulations')
+
+    def __str__(self):
+        return self.name
+
+class CustomUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='custom_profile',default=3)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    maternal_last_name = models.CharField(max_length=150, blank=True, null=True)
+    accepted_terms = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.username
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
+    bio = models.TextField(blank=True, null=True)
+    # Other fields for the user profile
+
+    def __str__(self):
+        return self.user.username

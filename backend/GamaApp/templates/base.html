@@ -18,13 +18,27 @@
     <!--    Document Title-->
     <!-- ===============================================-->
     <title>{% block title %}Default Title{% endblock %}</title>
+
+    <!-- Custom CSS -->
+    <style>
+      html, body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      .main {
+        flex: 1;
+      }
+    </style>
   </head>
 
   <body>
     <header>
       <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">
+          <a class="navbar-brand" href="{% url 'index' %}">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="30"
@@ -50,19 +64,9 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+              
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#"
-                  >Inicio</a
-                >
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Nosotros</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Preguntas</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link"href="#">Login</a>
+                <a class="btn btn-outline-dark" href="{% url 'login' %}">Login</a>
               </li>
             </ul>
           </div>

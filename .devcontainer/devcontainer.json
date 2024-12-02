@@ -5,10 +5,10 @@
     "workspaceFolder": "/app",
     "shutdownAction": "stopCompose",
     "settings": {
-        "python.pythonPath": "/usr/local/bin/python",
-        "editor.formatOnSave": true,
-        "prettier.requireConfig": true
-    },
+    "python.pythonPath": "/app/venv/bin/python",  // Cambia esto
+    "editor.formatOnSave": true,
+    "prettier.requireConfig": true
+},
     "extensions": [
         "ms-python.python",
         "ms-azuretools.vscode-docker",

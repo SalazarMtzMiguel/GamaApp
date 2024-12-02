@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Preguntas Frecuentes</h1>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Seccion en desarrollo</h2>
+            <p class="card-text">
+                #Se listaran preguntas#
+            </p>
+            <h3 class="mt-4">Tecnologías Utilizadas</h3>
+            <ul>
+                <li><strong>Django</strong>: Framework web de alto nivel para Python que permite el desarrollo rápido y limpio de aplicaciones web. En este proyecto, Django se utiliza para gestionar la lógica del servidor, la autenticación de usuarios y la interacción con la base de datos.</li>
+                <li><strong>GAMA Headless</strong>: Plataforma de simulación avanzada que permite la creación y ejecución de modelos complejos sin una interfaz gráfica, ideal para entornos de servidor.</li>
+                <li><strong>PostgreSQL</strong>: Sistema de gestión de bases de datos relacional de código abierto, conocido por su robustez y rendimiento. Almacena todos los datos relacionados con los usuarios, las simulaciones y los resultados de las simulaciones.</li>
+                <li><strong>Nginx</strong>: Servidor web y proxy inverso de alto rendimiento. Se utiliza para servir la aplicación web, manejar las solicitudes HTTP y actuar como un proxy inverso para Gunicorn, el servidor de aplicaciones de Django.</li>
+                <li><strong>Docker</strong>: Plataforma que permite la creación y gestión de contenedores, proporcionando un entorno aislado y reproducible para las aplicaciones. El archivo <code>docker-compose.yml</code> define los servicios necesarios y sus configuraciones.</li>
+                <li><strong>Vue.js (Futuro)</strong>: Framework progresivo para construir interfaces de usuario. En futuras actualizaciones, Vue.js se integrará en la plataforma para mejorar la experiencia del usuario, proporcionando una interfaz más dinámica y reactiva para gestionar y visualizar las simulaciones.</li>
+            </ul>
+            <h3 class="mt-4">Control de Usuarios y Permisos</h3>
+            <p class="card-text">
+                La plataforma utiliza el sistema de autenticación y permisos de Django para gestionar el acceso de los usuarios. Los usuarios pueden registrarse, iniciar sesión y cerrar sesión. Además, se pueden asignar diferentes roles y permisos a los usuarios para controlar el acceso a las distintas funcionalidades de la plataforma.
+            </p>
+            <h3 class="mt-4">Gestión de Simulaciones</h3>
+            <p class="card-text">
+                GAMA Headless se utiliza para ejecutar las simulaciones definidas por los adminisradores. Los resultados de las simulaciones se almacenan en la base de datos PostgreSQL y pueden ser analizados y visualizados a través de la plataforma web. Esto permite a los usuarios ejecutar simulaciones complejas directamente desde su navegador web, sin necesidad de instalar software adicional.
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+

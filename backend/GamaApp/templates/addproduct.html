@@ -1,5 +1,52 @@
-<form action="{% url "addproduct"%}" method='post'>
-     {% csrf_token %}
-{{form.as_p}}
-<button type="submit" class="btn btn-primary">Guardar</button>
-</form>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Agregar Producto</h1>
+    <form action="{% url 'addproduct' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="id_name" class="form-label">{{ form.name.label }}</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+            <div class="text-danger">{{ form.name.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_description" class="form-label">{{ form.description.label }}</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="text-danger">{{ form.description.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_price" class="form-label">{{ form.price.label }}</label>
+            {{ form.price }}
+            {% if form.price.errors %}
+            <div class="text-danger">{{ form.price.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-check mb-3">
+            {{ form.available }}
+            <label for="id_available" class="form-check-label">{{ form.available.label }}</label>
+            {% if form.available.errors %}
+            <div class="text-danger">{{ form.available.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_photo" class="form-label">{{ form.photo.label }}</label>
+            {{ form.photo }}
+            {% if form.photo.errors %}
+            <div class="text-danger">{{ form.photo.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
+{% endblock %}
