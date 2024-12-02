@@ -64,10 +64,37 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
-              
-              <li class="nav-item">
-                <a class="btn btn-outline-dark" href="{% url 'login' %}">Login</a>
-              </li>
+              {% if user.is_authenticated %}
+                {% if is_superuser %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin' %}">Administradores</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'permissions' %}">Permisos</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'simulations' %}">Simulaciones</a>
+                  </li>
+                {% elif is_admin %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'permissions' %}">Permisos</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'simulations' %}">Simulaciones</a>
+                  </li>
+                {% elif is_user %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'simulations' %}">Simulaciones</a>
+                  </li>
+                {% endif %}
+                <li class="nav-item">
+                  <a class="btn btn-outline-dark" href="{% url 'logout' %}">Logout</a>
+                </li>
+              {% else %}
+                <li class="nav-item">
+                  <a class="btn btn-outline-dark" href="{% url 'login' %}">Login</a>
+                </li>
+              {% endif %}
             </ul>
           </div>
         </div>

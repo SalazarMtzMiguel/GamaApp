@@ -18,7 +18,7 @@ from django.urls import path
 from GamaApp.views import *
 
 
-urlpatterns = [
+"""urlpatterns = [
     path('', my_view, name='index'),
     path('test/', my_test_view, name='test'),
     path('register/', UserRegistrationView.as_view(), name='register'),
@@ -29,4 +29,18 @@ urlpatterns = [
     path('products/', ProductListView.as_view(), name='products'),
     path('about/', about, name='about'),
     path('faq/', faq, name='faq'),
+]"""
+urlpatterns = [
+    path('', my_view, name='index'),
+    path('register/', UserRegistrationView.as_view(), name='register'),
+    path('login/', login, name='login'),
+    path('logout/', logout, name='logout'),
+    path('userview/', userview, name='userview'),
+    path('simulations/', SimulationsView.as_view(), name='simulations'),
+    path('addproduct/', ProductFormView.as_view(), name='addproduct'),
+    path('products/', ProductListView.as_view(), name='products'),
+    path('about/', about, name='about'),
+    path('faq/', faq, name='faq'),
+    path('admin/', AdminView.as_view(), name='admin'),
+    path('permissions/', PermissionsView.as_view(), name='permissions'),
 ]

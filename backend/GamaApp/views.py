@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.views.generic import FormView, TemplateView
 from django.views import generic
-from django.views.generic import FormView
-from GamaApp.forms import *
-from GamaApp.models import Product
 from django.urls import reverse_lazy
-from django.contrib.auth import login as auth_login, logout as auth_logout
+from GamaApp.forms import UserRegistrationForm, ProductForm
+from GamaApp.models import Product
 
 # Create your views here.
-
 
 def my_view(request):
     lista=[
@@ -20,8 +20,11 @@ def my_view(request):
             "title":"Nissan"
         },
     ]
-    context = {"lista":lista}
-    return render(request, 'index.html',context)
+    context = {
+        "lista": lista,
+    }
+    return render(request, 'index.html', context)
+
 def lista(request):
     lista=[
         {"item":"item1"},
@@ -33,19 +36,29 @@ def lista(request):
     context = {"lista":lista}
     return render(request, 'listado.html',context)
 
-def my_test_view(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
-    return HttpResponse("<h1>Hello World</h1>")
-
 def login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            auth_login(request, user)
+            return redirect('simulations')
+        else:
+            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
     return render(request, 'login.html')
 
+@login_required
+def logout(request):
+    auth_logout(request)
+    return redirect('login')
+
+@login_required
 def userview(request):
     return render(request, 'userview.html')
 
-def simulation(request):
-    return render(request, 'simulation.html')
+class SimulationsView(LoginRequiredMixin, TemplateView):
+    template_name = 'simulations.html'
 
 def about(request):
     return render(request, 'about.html')
@@ -53,7 +66,7 @@ def about(request):
 def faq(request):
     return render(request, 'faq.html')
 
-class ProductFormView(generic.FormView):
+class ProductFormView(FormView):
     template_name = 'addproduct.html'
     form_class = ProductForm
     success_url = reverse_lazy('addproduct')
@@ -77,9 +90,8 @@ class UserRegistrationView(FormView):
         auth_login(self.request, user)  # Inicia sesión automáticamente después del registro
         return redirect(self.success_url)
 
-def login(request):
-    return render(request, 'login.html')
+class AdminView(TemplateView):
+    template_name = 'adminview.html'
 
-def logout(request):
-    auth_logout(request)
-    return redirect('login')
+class PermissionsView(TemplateView):
+    template_name = 'permissions.html'

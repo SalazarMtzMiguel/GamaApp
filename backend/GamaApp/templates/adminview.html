@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Administradores</h1>
+    <form method="post">
+      {% csrf_token %}
+      <!-- Aquí puedes añadir los campos del formulario que necesites -->
+      <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+  </div>
+{% endblock %}
