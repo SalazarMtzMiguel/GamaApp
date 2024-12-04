@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="bg-primary text-white text-center py-2">
+  <h1>Seleccionar Parámetros para {{ simulation.name }}</h1>
+</header>
+
+<main class="container mt-4">
+  <form method="post" id="parameter-form">
+    {% csrf_token %}
+    <div class="mb-4">
+      <h5>Parámetros disponibles</h5>
+      <table class="table" id="parameters-table">
+        <thead>
+          <tr>
+            <th>Nombre del Parámetro</th>
+            <th>Nombre de la Variable</th>
+            <th>Categoría</th>
+            <th>Tipo de Dato</th>
+            <th>Valor</th>
+            <th>Valor Mínimo</th>
+            <th>Valor Máximo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filas de parámetros se agregarán aquí dinámicamente -->
+        </tbody>
+      </table>
+      <button type="button" class="btn btn-secondary" id="add-parameter">Añadir Parámetro</button>
+    </div>
+    <input type="hidden" name="parameters" id="parameters-input">
+    <button type="submit" class="btn btn-success">Guardar Parámetros</button>
+  </form>
+</main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const parametersTable = document.getElementById('parameters-table').getElementsByTagName('tbody')[0];
+    const parametersInput = document.getElementById('parameters-input');
+    const addParameterButton = document.getElementById('add-parameter');
+
+    addParameterButton.addEventListener('click', function() {
+      const row = parametersTable.insertRow();
+      const nameCell = row.insertCell(0);
+      const variableNameCell = row.insertCell(1);
+      const categoryCell = row.insertCell(2);
+      const dataTypeCell = row.insertCell(3);
+      const valueCell = row.insertCell(4);
+      const minValueCell = row.insertCell(5);
+      const maxValueCell = row.insertCell(6);
+      const actionsCell = row.insertCell(7);
+
+      nameCell.innerHTML = '<input type="text" class="form-control" name="name">';
+      variableNameCell.innerHTML = '<input type="text" class="form-control" name="variable_name">';
+      categoryCell.innerHTML = '<input type="text" class="form-control" name="category">';
+      dataTypeCell.innerHTML = `
+  <select class="form-control" name="data_type">
+    <option value="int">Int</option>
+    <option value="float">Float</option>
+    <option value="bool">Bool</option>
+    <option value="string">String</option>
+  </select>`;
+      valueCell.innerHTML = '<input type="text" class="form-control" name="value">';
+      minValueCell.innerHTML = '<input type="number" step="any" class="form-control" name="min_value">';
+      maxValueCell.innerHTML = '<input type="number" step="any" class="form-control" name="max_value">';
+      actionsCell.innerHTML = '<button type="button" class="btn btn-danger remove-parameter">Eliminar</button>';
+
+      actionsCell.querySelector('.remove-parameter').addEventListener('click', function() {
+        parametersTable.deleteRow(row.rowIndex - 1);
+      });
+    });
+
+    document.getElementById('parameter-form').addEventListener('submit', function(event) {
+      const parameters = [];
+      for (let row of parametersTable.rows) {
+        const name = row.querySelector('input[name="name"]').value;
+        const variable_name = row.querySelector('input[name="variable_name"]').value;
+        const category = row.querySelector('input[name="category"]').value;
+        const data_type = row.querySelector('select[name="data_type"]').value;
+        const value = row.querySelector('input[name="value"]').value;
+        const min_value = row.querySelector('input[name="min_value"]').value;
+        const max_value = row.querySelector('input[name="max_value"]').value;
+        if (name && variable_name && data_type) {
+          parameters.push({ name, variable_name, category, data_type, value, min_value, max_value });
+        }
+      }
+      parametersInput.value = JSON.stringify(parameters);
+    });
+  });
+</script>
+{% endblock %}

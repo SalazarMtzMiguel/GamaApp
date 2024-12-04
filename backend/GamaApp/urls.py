@@ -17,6 +17,7 @@ urlpatterns = [
     path('add_simulation/', ProjectListForSimulationView.as_view(), name='add_simulation'),
     path('select_simulation/<int:project_id>/', SelectSimulationView.as_view(), name='select_simulation'),
     path('process_simulation/<int:project_id>/', ProcessSimulationView.as_view(), name='process_simulation'),
+    path('select_parameters/<int:simulation_id>/', SelectParameterView.as_view(), name='select_parameters'),
     path('run_simulation/<int:simulation_id>/', run_simulation, name='run_simulation'),
     path('edit_simulation/', EditSimulationView.as_view(), name='edit_simulation'),
     path('delete_simulation/', DeleteSimulationView.as_view(), name='delete_simulation'),

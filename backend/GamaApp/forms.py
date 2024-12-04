@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 import os  # Asegúrate de importar el módulo os
 import zipfile
 from django.conf import settings
+import json
 
 class UserRegistrationForm(UserCreationForm):
     username = forms.CharField(label="Nombre de usuario", max_length=150)
@@ -54,26 +55,12 @@ class UploadProjectForm(forms.Form):
             for file in files:
                 if file.endswith('.gaml'):
                     gaml_file_path = os.path.join(root, file)
-                    self.read_gaml_file(gaml_file_path, project)
-
-    def read_gaml_file(self, gaml_file_path, project):
-        with open(gaml_file_path, 'r') as file:
-            simulation_name = os.path.basename(gaml_file_path).replace('.gaml', '')
-            simulation = Simulation.objects.create(name=simulation_name, file=gaml_file_path, project=project, active=False)
-            for line in file:
-                if line.startswith('parameter'):
-                    parts = line.split()
-                    name = parts[1]
-                    description = ' '.join(parts[2:])
-                    Parameter.objects.create(name=name, description=description, simulation=simulation)
-
-class EditProjectForm(forms.ModelForm):
-    class Meta:
-        model = Project
-        fields = ['description']
-        labels = {
-            'description': 'Descripción del Proyecto',
-        }
+                    Simulation.objects.create(
+                        name=os.path.basename(gaml_file_path).replace('.gaml', ''),
+                        file=gaml_file_path,
+                        project=project,
+                        active=False
+                    )
 
 class SelectSimulationForm(forms.Form):
     selected_files = forms.MultipleChoiceField(
@@ -81,8 +68,36 @@ class SelectSimulationForm(forms.Form):
         choices=[],
         label="Selecciona los archivos .gaml que serán simulaciones"
     )
+    active_files = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
+        choices=[],
+        label="Selecciona los archivos .gaml que estarán activos",
+        required=False
+    )
 
     def __init__(self, *args, **kwargs):
         gaml_files = kwargs.pop('gaml_files', [])
         super().__init__(*args, **kwargs)
         self.fields['selected_files'].choices = [(file, file) for file in gaml_files]
+        self.fields['active_files'].choices = [(file, file) for file in gaml_files]
+
+class ParameterForm(forms.Form):
+    name = forms.CharField(max_length=100, label="Nombre del Parámetro")
+    variable_name = forms.CharField(max_length=100, label="Nombre de la Variable")
+    category = forms.CharField(max_length=100, label="Categoría", required=False)
+    data_type = forms.ChoiceField(choices=[('float', 'Float'), ('boolean', 'Boolean')], label="Tipo de Dato")
+    value = forms.CharField(max_length=100, label="Valor", required=False)
+    min_value = forms.FloatField(label="Valor Mínimo", required=False)
+    max_value = forms.FloatField(label="Valor Máximo", required=False)
+
+class SelectParameterForm(forms.Form):
+    parameters = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+    def clean_parameters(self):
+        parameters = self.cleaned_data.get('parameters', '')
+        if parameters:
+            try:
+                parameters = json.loads(parameters)
+            except json.JSONDecodeError:
+                raise forms.ValidationError("Formato de parámetros inválido.")
+        return parameters

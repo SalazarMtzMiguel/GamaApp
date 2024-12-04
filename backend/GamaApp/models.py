@@ -27,7 +27,7 @@ class Simulation(models.Model):
     file = models.FileField(upload_to='Projects/%Y/%m/%d/')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='simulations')
     users_with_access = models.ManyToManyField(CustomUser, related_name='allowed_simulations')
-    active = models.BooleanField(default=False)  # Nuevo campo para indicar si la simulación está activa
+    active = models.BooleanField(default=False)  # Campo para indicar si la simulación está activa
 
     def __str__(self):
         return self.name
@@ -41,8 +41,13 @@ class Role(models.Model):
         return self.name
 
 class Parameter(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
+    name = models.CharField(max_length=100,default='Parametros')
+    variable_name = models.CharField(max_length=100,default='variable')
+    category = models.CharField(max_length=100, blank=True, null=True)
+    data_type = models.CharField(max_length=50,default='int')
+    value = models.CharField(max_length=100, blank=True, null=True)
+    min_value = models.FloatField(blank=True, null=True)
+    max_value = models.FloatField(blank=True, null=True)
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE, related_name='parameters')
 
     def __str__(self):

@@ -1,16 +1,17 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from GamaApp.mixins import SuperuserRequiredMixin, AdminOrSuperuserRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import FormView, TemplateView, UpdateView, DeleteView, ListView, View
 from django.urls import reverse_lazy
-from GamaApp.forms import UserRegistrationForm, UploadProjectForm, SelectSimulationForm
+from GamaApp.forms import UserRegistrationForm, UploadProjectForm, SelectSimulationForm, SelectParameterForm
 from GamaApp.models import Project, Simulation, Parameter
 import os
 from django.conf import settings
 import zipfile
 from django.http import HttpResponse
+import json
 
 # Create your views here.
 
@@ -43,7 +44,9 @@ class SimulationsView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['projects'] = Project.objects.all()
+        # Filtrar proyectos que tienen simulaciones activas
+        active_projects = Project.objects.filter(simulations__active=True).distinct()
+        context['projects'] = active_projects
         return context
 
 def about(request):
@@ -107,7 +110,11 @@ class DeleteProjectView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, Delet
         project_dir = os.path.join(settings.MEDIA_ROOT, 'Projects', self.object.name)
         if os.path.exists(project_dir):
             import shutil
-            shutil.rmtree(project_dir)
+            try:
+                shutil.rmtree(project_dir)
+                print(f"Directorio {project_dir} eliminado correctamente.")
+            except Exception as e:
+                print(f"Error al eliminar el directorio {project_dir}: {e}")
         return super().delete(request, *args, **kwargs)
 
 class ProjectListForSimulationView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, ListView):
@@ -120,28 +127,15 @@ class SelectSimulationView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, Vi
 
     def get(self, request, project_id):
         project = Project.objects.get(id=project_id)
-        project_dir = os.path.join(settings.MEDIA_ROOT, 'Projects', project.name, 'models')
-        gaml_files = [f for f in os.listdir(project_dir) if f.endswith('.gaml')]
-        return render(request, self.template_name, {'project': project, 'gaml_files': gaml_files})
+        simulations = project.simulations.filter(active=False)
+        return render(request, self.template_name, {'project': project, 'simulations': simulations})
 
     def post(self, request, project_id):
-        project = Project.objects.get(id=project_id)
-        selected_files = request.POST.getlist('selected_files')
-        for file_name in selected_files:
-            gaml_file_path = os.path.join(settings.MEDIA_ROOT, 'Projects', project.name, 'models', file_name)
-            self.read_gaml_file(gaml_file_path, project)
-        return redirect('simulations')
-
-    def read_gaml_file(self, gaml_file_path, project):
-        with open(gaml_file_path, 'r') as file:
-            simulation_name = os.path.basename(gaml_file_path).replace('.gaml', '')
-            simulation = Simulation.objects.create(name=simulation_name, file=gaml_file_path, project=project, active=False)
-            for line in file:
-                if line.startswith('parameter'):
-                    parts = line.split()
-                    name = parts[1]
-                    description = ' '.join(parts[2:])
-                    Parameter.objects.create(name=name, description=description, simulation=simulation)
+        simulation_id = request.POST.get('simulation_id')
+        simulation = get_object_or_404(Simulation, id=simulation_id)
+        simulation.active = True
+        simulation.save()
+        return redirect('select_parameters', simulation_id=simulation.id)
 
 class ProcessSimulationView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, View):
     def post(self, request, project_id):
@@ -168,3 +162,32 @@ def run_simulation(request, simulation_id):
     simulation = get_object_or_404(Simulation, id=simulation_id)
     # Aquí puedes añadir el código para ejecutar la simulación
     return HttpResponse(f"Ejecutando simulación: {simulation.name}")
+
+
+class SelectParameterView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, View):
+    template_name = 'select_parameters.html'
+
+    def get(self, request, simulation_id):
+        simulation = get_object_or_404(Simulation, id=simulation_id)
+        form = SelectParameterForm()
+        return render(request, self.template_name, {'simulation': simulation, 'form': form})
+
+    def post(self, request, simulation_id):
+        simulation = get_object_or_404(Simulation, id=simulation_id)
+        form = SelectParameterForm(request.POST)
+        if form.is_valid():
+            parameters = form.cleaned_data['parameters']
+            if parameters:
+                for param in parameters:
+                    Parameter.objects.create(
+                        name=param['name'],
+                        variable_name=param['variable_name'],
+                        category=param.get('category', ''),
+                        data_type=param['data_type'],
+                        value=param.get('value', ''),
+                        min_value=param.get('min_value', None),
+                        max_value=param.get('max_value', None),
+                        simulation=simulation
+                    )
+            return redirect('simulations')
+        return render(request, self.template_name, {'simulation': simulation, 'form': form})
