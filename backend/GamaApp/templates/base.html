@@ -67,7 +67,7 @@
               {% if user.is_authenticated %}
                 {% if is_superuser %}
                   <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin' %}">Administradores</a>
+                    <a class="nav-link" href="{% url 'adminview' %}">Administradores</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'permissions' %}">Permisos</a>

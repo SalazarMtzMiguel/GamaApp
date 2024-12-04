@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="bg-primary text-white text-center py-2">
+  <h1>Editar Proyecto</h1>
+</header>
+
+<main class="container mt-4">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+  </form>
+</main>
+{% endblock %}

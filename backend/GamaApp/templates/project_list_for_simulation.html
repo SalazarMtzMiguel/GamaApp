@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="bg-primary text-white text-center py-2">
+  <h1>Proyectos Disponibles</h1>
+</header>
+
+<main class="container mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      {% for project in projects %}
+      <div class="card mb-4">
+        <div class="card-header">
+          {{ project.name }}
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ project.description }}</p>
+          <a href="{% url 'select_simulation' project.id %}" class="btn btn-primary">Buscar Simulaciones</a>
+        </div>
+      </div>
+      {% empty %}
+      <p>No hay proyectos disponibles.</p>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+{% endblock %}

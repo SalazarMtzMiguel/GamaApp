@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="bg-primary text-white text-center py-2">
+  <h1>Seleccionar Simulaciones para {{ project.name }}</h1>
+</header>
+
+<main class="container mt-4">
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-4">
+      <h5>Archivos .gaml disponibles</h5>
+      {{ form.as_p }}
+    </div>
+    <button type="submit" class="btn btn-success">Guardar Simulaciones</button>
+  </form>
+</main>
+{% endblock %}
