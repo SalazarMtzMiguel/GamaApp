@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Editar Parámetros de {{ simulation.name }} para {{ user.user.username }}</h1>
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Parámetros Activos</h3>
+      <ul class="list-group">
+        {% for parameter in active_parameters %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ parameter.name }}
+            <form method="post" class="d-inline">
+              {% csrf_token %}
+              <input type="hidden" name="parameter_id" value="{{ parameter.id }}">
+              <input type="hidden" name="action" value="deactivate">
+              <button type="submit" class="btn btn-danger btn-sm">Desactivar</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <h3>Parámetros Inactivos</h3>
+      <ul class="list-group">
+        {% for parameter in inactive_parameters %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ parameter.name }}
+            <form method="post" class="d-inline">
+              {% csrf_token %}
+              <input type="hidden" name="parameter_id" value="{{ parameter.id }}">
+              <input type="hidden" name="action" value="activate">
+              <button type="submit" class="btn btn-success btn-sm">Activar</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

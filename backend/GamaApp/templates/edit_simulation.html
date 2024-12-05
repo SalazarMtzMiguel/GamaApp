@@ -1,11 +1,93 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="container mt-5">
-    <h1 class="text-center mb-4">Modificar Simulación</h1>
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <!-- Aquí puedes añadir los campos del formulario que necesites -->
-      <button type="submit" class="btn btn-warning">Modificar</button>
-    </form>
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Editar Parámetros de {{ simulation.name }}</h1>
+  <div class="row">
+    <div class="col-md-12">
+      <h3>Parámetros</h3>
+      <ul class="list-group mb-4">
+        {% for parameter in parameters %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <form method="post" class="d-inline w-100">
+            {% csrf_token %}
+            <input type="hidden" name="parameter_id" value="{{ parameter.id }}">
+            <input type="hidden" name="action" value="update">
+            <div class="row">
+              <div class="col-md-2">
+                <input type="text" name="name" value="{{ parameter.name }}" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-2">
+                <input type="text" name="variable_name" value="{{ parameter.variable_name }}" class="form-control" placeholder="Variable">
+              </div>
+              <div class="col-md-2">
+                <input type="text" name="category" value="{{ parameter.category }}" class="form-control" placeholder="Categoría">
+              </div>
+              <div class="col-md-2">
+                <select name="data_type" class="form-control">
+                  <option value="float" {% if parameter.data_type == 'float' %}selected{% endif %}>Float</option>
+                  <option value="boolean" {% if parameter.data_type == 'boolean' %}selected{% endif %}>Boolean</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <input type="text" name="value" value="{{ parameter.value }}" class="form-control" placeholder="Valor">
+              </div>
+              <div class="col-md-1">
+                <input type="text" name="min_value" value="{{ parameter.min_value }}" class="form-control" placeholder="Min">
+              </div>
+              <div class="col-md-1">
+                <input type="text" name="max_value" value="{{ parameter.max_value }}" class="form-control" placeholder="Max">
+              </div>
+              <div class="col-md-1">
+                <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
+              </div>
+              <div class="col-md-1">
+                <form method="post" class="d-inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="parameter_id" value="{{ parameter.id }}">
+                  <input type="hidden" name="action" value="remove">
+                  <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+              </div>
+            </div>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      <h3>Añadir Nuevo Parámetro</h3>
+      <form method="post" class="mb-4">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        <div class="row">
+          <div class="col-md-2">
+            <input type="text" name="name" class="form-control" placeholder="Nombre">
+          </div>
+          <div class="col-md-2">
+            <input type="text" name="variable_name" class="form-control" placeholder="Variable">
+          </div>
+          <div class="col-md-2">
+            <input type="text" name="category" class="form-control" placeholder="Categoría">
+          </div>
+          <div class="col-md-2">
+            <select name="data_type" class="form-control">
+              <option value="float">Float</option>
+              <option value="boolean">Boolean</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <input type="text" name="value" class="form-control" placeholder="Valor">
+          </div>
+          <div class="col-md-1">
+            <input type="text" name="min_value" class="form-control" placeholder="Min">
+          </div>
+          <div class="col-md-1">
+            <input type="text" name="max_value" class="form-control" placeholder="Max">
+          </div>
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-success btn-sm">Añadir</button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
+</div>
 {% endblock %}

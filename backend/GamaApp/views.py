@@ -5,13 +5,19 @@ from GamaApp.mixins import SuperuserRequiredMixin, AdminOrSuperuserRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import FormView, TemplateView, UpdateView, DeleteView, ListView, View
 from django.urls import reverse_lazy
-from GamaApp.forms import UserRegistrationForm, UploadProjectForm, SelectSimulationForm, SelectParameterForm
-from GamaApp.models import Project, Simulation, Parameter
+from GamaApp.forms import UserRegistrationForm, UploadProjectForm,  SelectParameterForm, AssignProjectForm, AssignSimulationForm
+from GamaApp.models import Project, Simulation, Parameter, UserProject, CustomUser, PublicSimulation
 import os
 from django.conf import settings
 import zipfile
 from django.http import HttpResponse
 import json
+from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import Q
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import Group
+
 
 # Create your views here.
 
@@ -44,9 +50,27 @@ class SimulationsView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Filtrar proyectos que tienen simulaciones activas
-        active_projects = Project.objects.filter(simulations__active=True).distinct()
-        context['projects'] = active_projects
+        user = self.request.user.custom_profile
+
+        if self.request.user.is_superuser or self.request.user.groups.filter(name='Administradores').exists():
+            # Superadministradores y administradores pueden ver todos los proyectos y simulaciones
+            assigned_projects = Project.objects.all()
+            public_simulations = Simulation.objects.filter(public_simulation__isnull=False, active=True)
+        else:
+            # Filtrar proyectos y simulaciones asignados al usuario
+            assigned_projects = user.projects.all()
+            public_simulations = Simulation.objects.filter(public_simulation__isnull=False, active=True)
+
+        project_simulations = []
+        for project in assigned_projects:
+            active_simulations = project.simulations.filter(active=True)
+            project_simulations.append({
+                'project': project,
+                'active_simulations': active_simulations
+            })
+
+        context['project_simulations'] = project_simulations
+        context['public_simulations'] = public_simulations
         return context
 
 def about(request):
@@ -68,14 +92,84 @@ class UserRegistrationView(FormView):
 class AdminView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     template_name = 'adminview.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('q')
+        if query:
+            users = User.objects.filter(
+                Q(username__icontains=query) |
+                Q(email__icontains=query) |
+                Q(custom_profile__first_name__icontains=query) |
+                Q(custom_profile__last_name__icontains=query)
+            )
+        else:
+            users = User.objects.all()
+
+        for user in users:
+            user.is_admin = user.groups.filter(name='Administradores').exists()
+
+        context['users'] = users
+        return context
+
+class ConfirmAdminView(LoginRequiredMixin, SuperuserRequiredMixin, View):
+    template_name = 'confirm_admin.html'
+
+    def get(self, request, user_id, action):
+        user = get_object_or_404(User, id=user_id)
+        user.is_admin = user.groups.filter(name='Administradores').exists()
+        return render(request, self.template_name, {'user': user, 'action': action})
+
+    def post(self, request, user_id, action):
+        user = get_object_or_404(User, id=user_id)
+        admin_group = Group.objects.get(name='Administradores')
+        if action == 'make_admin':
+            user.groups.add(admin_group)
+        elif action == 'revoke_admin':
+            user.groups.remove(admin_group)
+        user.save()
+        return redirect('adminview')
+
 class PermissionsView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, TemplateView):
     template_name = 'permissions.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['users'] = CustomUser.objects.all()
+        context['projects'] = Project.objects.all()  # Asegúrate de pasar los proyectos al contexto
+        return context
 
 class AddSimulationView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, TemplateView):
     template_name = 'add_simulation.html'
 
-class EditSimulationView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, TemplateView):
-    template_name = 'edit_simulation.html'
+class EditSimulationParametersView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, View):
+    template_name = 'edit_simulation_parameters.html'
+
+    def get(self, request, user_id, simulation_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+        simulation = get_object_or_404(Simulation, id=simulation_id)
+        active_parameters = simulation.parameters.filter(active=True)
+        inactive_parameters = simulation.parameters.filter(active=False)
+        return render(request, self.template_name, {
+            'user': user,
+            'simulation': simulation,
+            'active_parameters': active_parameters,
+            'inactive_parameters': inactive_parameters
+        })
+
+    def post(self, request, user_id, simulation_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+        simulation = get_object_or_404(Simulation, id=simulation_id)
+        parameter_id = request.POST.get('parameter_id')
+        action = request.POST.get('action')
+        parameter = get_object_or_404(Parameter, id=parameter_id)
+
+        if action == 'activate':
+            parameter.active = True
+        elif action == 'deactivate':
+            parameter.active = False
+        parameter.save()
+
+        return redirect('edit_simulation_parameters', user_id=user_id, simulation_id=simulation_id)
 
 class DeleteSimulationView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, TemplateView):
     template_name = 'delete_simulation.html'
@@ -191,3 +285,160 @@ class SelectParameterView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, Vie
                     )
             return redirect('simulations')
         return render(request, self.template_name, {'simulation': simulation, 'form': form})
+
+class ConfirmDeleteUserView(LoginRequiredMixin, SuperuserRequiredMixin, View):
+    template_name = 'confirm_delete_user.html'
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        return render(request, self.template_name, {'user': user})
+
+    def post(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        user.delete()
+        return redirect('adminview')
+    
+class AssignProjectView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, View):
+    template_name = 'assign_project.html'
+    form_class = AssignProjectForm
+
+    def get(self, request, user_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+        all_projects = Project.objects.all()
+        user_projects = user.projects.all()
+        available_projects = all_projects.difference(user_projects)
+        return render(request, self.template_name, {
+            'user': user,
+            'available_projects': available_projects,
+            'user_projects': user_projects
+        })
+
+    def post(self, request, user_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+        project_id = request.POST.get('project_id')
+        action = request.POST.get('action')
+        project = get_object_or_404(Project, id=project_id)
+
+        if action == 'add':
+            UserProject.objects.create(user=user, project=project, can_change_parameters=True)
+            simulations = project.simulations.filter(active=True)
+            for simulation in simulations:
+                simulation.users_with_access.add(user)
+        elif action == 'remove':
+            UserProject.objects.filter(user=user, project=project).delete()
+            simulations = project.simulations.filter(active=True)
+            for simulation in simulations:
+                simulation.users_with_access.remove(user)
+
+        return redirect('permissions')
+
+class AssignSimulationView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, View):
+    template_name = 'assign_simulation.html'
+
+    def get(self, request, user_id, project_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+        project = get_object_or_404(Project, id=project_id)
+        all_simulations = project.simulations.filter(active=True)
+        assigned_simulations = all_simulations.filter(users_with_access=user)
+        unassigned_simulations = all_simulations.difference(assigned_simulations)
+        return render(request, self.template_name, {
+            'user': user,
+            'project': project,
+            'assigned_simulations': assigned_simulations,
+            'unassigned_simulations': unassigned_simulations
+        })
+
+    def post(self, request, user_id, project_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+        project = get_object_or_404(Project, id=project_id)
+        simulation_id = request.POST.get('simulation_id')
+        action = request.POST.get('action')
+        simulation = get_object_or_404(Simulation, id=simulation_id)
+
+        if action == 'assign':
+            simulation.users_with_access.add(user)
+        elif action == 'remove':
+            simulation.users_with_access.remove(user)
+
+        return redirect('assign_simulation', user_id=user_id, project_id=project_id)
+    
+class ProjectSimulationListView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, TemplateView):
+    template_name = 'project_simulation_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        projects = Project.objects.all()
+        project_simulations = []
+        for project in projects:
+            active_simulations = project.simulations.filter(active=True)
+            project_simulations.append({
+                'project': project,
+                'active_simulations': active_simulations
+            })
+        context['project_simulations'] = project_simulations
+        return context
+
+    def post(self, request, *args, **kwargs):
+        simulation_id = request.POST.get('simulation_id')
+        action = request.POST.get('action')
+        simulation = get_object_or_404(Simulation, id=simulation_id)
+
+        if action == 'delete':
+            simulation.active = False
+            simulation.save()
+            # Eliminar de simulaciones públicas si está presente
+            PublicSimulation.objects.filter(simulation=simulation).delete()
+        elif action == 'make_public':
+            PublicSimulation.objects.get_or_create(simulation=simulation)
+        elif action == 'remove_public':
+            PublicSimulation.objects.filter(simulation=simulation).delete()
+
+        return redirect('project_simulation_list')
+
+class EditSimulationView(LoginRequiredMixin, AdminOrSuperuserRequiredMixin, View):
+    template_name = 'edit_simulation.html'
+
+    def get(self, request, simulation_id):
+        simulation = get_object_or_404(Simulation, id=simulation_id)
+        parameters = simulation.parameters.all()
+        return render(request, self.template_name, {
+            'simulation': simulation,
+            'parameters': parameters
+        })
+
+    def post(self, request, simulation_id):
+        simulation = get_object_or_404(Simulation, id=simulation_id)
+        action = request.POST.get('action')
+        if action == 'delete':
+            simulation.active = False
+            simulation.save()
+            return redirect('project_simulation_list')
+        elif action == 'update':
+            parameter_id = request.POST.get('parameter_id')
+            parameter = get_object_or_404(Parameter, id=parameter_id)
+            parameter.name = request.POST.get('name')
+            parameter.variable_name = request.POST.get('variable_name')
+            parameter.category = request.POST.get('category')
+            parameter.data_type = request.POST.get('data_type')
+            parameter.value = request.POST.get('value')
+            parameter.min_value = request.POST.get('min_value')
+            parameter.max_value = request.POST.get('max_value')
+            parameter.save()
+            return redirect('edit_simulation', simulation_id=simulation_id)
+        elif action == 'add':
+            Parameter.objects.create(
+                name=request.POST.get('name'),
+                variable_name=request.POST.get('variable_name'),
+                category=request.POST.get('category'),
+                data_type=request.POST.get('data_type'),
+                value=request.POST.get('value'),
+                min_value=request.POST.get('min_value'),
+                max_value=request.POST.get('max_value'),
+                simulation=simulation
+            )
+            return redirect('edit_simulation', simulation_id=simulation_id)
+        elif action == 'remove':
+            parameter_id = request.POST.get('parameter_id')
+            parameter = get_object_or_404(Parameter, id=parameter_id)
+            parameter.delete()
+            return redirect('edit_simulation', simulation_id=simulation_id)

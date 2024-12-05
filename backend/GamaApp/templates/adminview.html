@@ -1,11 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="container mt-5">
-    <h1 class="text-center mb-4">Administradores</h1>
-    <form method="post">
-      {% csrf_token %}
-      <!-- Aquí puedes añadir los campos del formulario que necesites -->
-      <button type="submit" class="btn btn-primary">Enviar</button>
-    </form>
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Administradores</h1>
+  <form method="get" class="mb-4">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Buscar por nombre o email" value="{{ request.GET.q }}">
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </div>
+  </form>
+  <div class="row">
+    {% for user in users %}
+    <div class="col-md-4 mb-3">
+      <div class="card {% if user.is_admin %}border-success{% else %}border-secondary{% endif %}">
+        <div class="card-body">
+          <h5 class="card-title">{{ user.username }}</h5>
+          <p class="card-text">
+            Nombre: {{ user.custom_profile.first_name }} {{ user.custom_profile.last_name }}<br>
+            Email: {{ user.email }}<br>
+            {% if user.is_admin %}
+            <span class="badge rounded-pill text-bg-warning">Administrador</span>
+            {% else %}
+            <span class="badge rounded-pill text-bg-secondary">Usuario</span>
+            {% endif %}
+          </p>
+          <div class="d-flex justify-content-between">
+            {% if user.is_admin %}
+            <a href="{% url 'confirm_admin' user.id 'revoke_admin' %}" class="btn btn-outline-dark">Revocar Admin</a>
+            {% else %}
+            <a href="{% url 'confirm_admin' user.id 'make_admin' %}" class="btn btn-outline-success">Convertir en Admin</a>
+            {% endif %}
+            <a href="{% url 'confirm_delete_user' user.id %}" class="btn btn-outline-danger">Eliminar Usuario</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
   </div>
+</div>
 {% endblock %}

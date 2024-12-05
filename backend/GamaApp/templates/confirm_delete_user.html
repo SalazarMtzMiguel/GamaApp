@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Confirmar Eliminación</h1>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">{{ user.username }}</h5>
+      <p class="card-text">
+        Nombre: {{ user.first_name }} {{ user.last_name }}<br>
+        Email: {{ user.email }}<br>
+        {% if user.is_staff %}
+        <span class="badge bg-success">Administrador</span>
+        {% else %}
+        <span class="badge bg-secondary">Usuario</span>
+        {% endif %}
+      </p>
+      <form method="post">
+        {% csrf_token %}
+        <p>¿Estás seguro de que deseas eliminar a este usuario?</p>
+        <button type="submit" class="btn btn-primary">Confirmar</button>
+        <a href="{% url 'adminview' %}" class="btn btn-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

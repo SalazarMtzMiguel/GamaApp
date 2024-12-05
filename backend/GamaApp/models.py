@@ -7,6 +7,8 @@ class CustomUser(models.Model):
     last_name = models.CharField(max_length=150)
     maternal_last_name = models.CharField(max_length=150, blank=True, null=True)
     accepted_terms = models.BooleanField(default=False)
+    projects = models.ManyToManyField('Project', through='UserProject', related_name='assigned_users')
+    can_change_parameters = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
@@ -16,7 +18,7 @@ class Project(models.Model):
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='projects')
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='owned_projects')
     file = models.FileField(upload_to='Projects/')
 
     def __str__(self):
@@ -41,14 +43,15 @@ class Role(models.Model):
         return self.name
 
 class Parameter(models.Model):
-    name = models.CharField(max_length=100,default='Parametros')
-    variable_name = models.CharField(max_length=100,default='variable')
+    name = models.CharField(max_length=100, default='Parametros')
+    variable_name = models.CharField(max_length=100, default='variable')
     category = models.CharField(max_length=100, blank=True, null=True)
-    data_type = models.CharField(max_length=50,default='int')
+    data_type = models.CharField(max_length=50, default='int')
     value = models.CharField(max_length=100, blank=True, null=True)
     min_value = models.FloatField(blank=True, null=True)
     max_value = models.FloatField(blank=True, null=True)
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE, related_name='parameters')
+    active = models.BooleanField(default=True)  # Campo para indicar si el parámetro está activo
 
     def __str__(self):
         return self.name
@@ -67,3 +70,18 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+class UserProject(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    project = models.ForeignKey('Project', on_delete=models.CASCADE)
+    can_change_parameters = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'project')
+
+class PublicSimulation(models.Model):
+    simulation = models.OneToOneField(Simulation, on_delete=models.CASCADE, related_name='public_simulation')
+
+    def __str__(self):
+        return self.simulation.name
+    

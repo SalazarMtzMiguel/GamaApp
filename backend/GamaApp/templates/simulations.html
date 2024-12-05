@@ -20,49 +20,69 @@
       <a class="navbar-brand m-2">Proyectos</a>
       <a href="{% url 'add_project' %}" class="btn btn-success m-2">Añadir Proyecto</a>
       <a href="{% url 'edit_project' %}" class="btn btn-warning m-2">Editar Proyecto</a>
-      <a href="{% url 'delete_project' %}" class="btn btn-danger m-2">Eliminar Proyecto</a>
     </div>
     <div class="navbar bg-body-tertiary">
       <a class="navbar-brand m-2">Simulaciones</a>
       <a href="{% url 'add_simulation' %}" class="btn btn-success m-2">Añadir Simulación</a>
-      <a href="{% url 'edit_simulation' %}" class="btn btn-warning m-2">Editar Simulación</a>
-      <a href="{% url 'delete_simulation' %}" class="btn btn-danger m-2">Eliminar Simulación</a>
+      <a href="{% url 'project_simulation_list' %}" class="btn btn-warning m-2">Editar Simulación</a>
     </div>
   </div>
   {% endif %}
 
+  <!-- Sección de simulaciones públicas -->
   <div class="row">
     <div class="col-md-12">
-      <!-- Listado de proyectos -->
-      {% for project in projects %}
+      <h3>Simulaciones Públicas</h3>
+      <div class="accordion" id="publicSimulationsAccordion">
+        {% for simulation in public_simulations %}
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingPublic{{ simulation.id }}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePublic{{ simulation.id }}" aria-expanded="false" aria-controls="collapsePublic{{ simulation.id }}">
+              {{ simulation.name }}
+            </button>
+          </h2>
+          <div id="collapsePublic{{ simulation.id }}" class="accordion-collapse collapse" aria-labelledby="headingPublic{{ simulation.id }}" data-bs-parent="#publicSimulationsAccordion">
+            <div class="accordion-body">
+              <a href="{% url 'run_simulation' simulation.id %}" class="btn btn-primary">Ejecutar Simulación</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de proyectos y simulaciones asignadas -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <h3>Proyectos Asignados</h3>
+      {% for item in project_simulations %}
       <div class="card mb-4">
         <div class="card-header">
-          {{ project.name }}
+          {{ item.project.name }}
         </div>
         <div class="card-body">
           <h5 class="card-title">Simulaciones</h5>
-          <div class="accordion" id="accordionExample{{ project.id }}">
-            {% for simulation in project.simulations.all %}
-            {% if simulation.active %}
+          <div class="accordion" id="accordionExample{{ item.project.id }}">
+            {% for simulation in item.active_simulations %}
             <div class="accordion-item">
               <h2 class="accordion-header" id="heading{{ simulation.id }}">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ simulation.id }}" aria-expanded="false" aria-controls="collapse{{ simulation.id }}">
                   {{ simulation.name }}
                 </button>
               </h2>
-              <div id="collapse{{ simulation.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ simulation.id }}" data-bs-parent="#accordionExample{{ project.id }}">
+              <div id="collapse{{ simulation.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ simulation.id }}" data-bs-parent="#accordionExample{{ item.project.id }}">
                 <div class="accordion-body">
                   <a href="{% url 'run_simulation' simulation.id %}" class="btn btn-primary">Ejecutar Simulación</a>
                 </div>
               </div>
             </div>
-            {% endif %}
             {% endfor %}
           </div>
         </div>
       </div>
       {% empty %}
-      <p>No hay proyectos disponibles.</p>
+      <p>No hay proyectos asignados.</p>
       {% endfor %}
     </div>
   </div>

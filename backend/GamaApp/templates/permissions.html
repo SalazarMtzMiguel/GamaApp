@@ -1,11 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="container mt-5">
-    <h1 class="text-center mb-4">Administradores</h1>
-    <form method="post">
-      {% csrf_token %}
-      <!-- Aquí puedes añadir los campos del formulario que necesites -->
-      <button type="submit" class="btn btn-primary">Enviar</button>
-    </form>
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Gestionar Permisos</h1>
+  <div class="mb-4">
+    <input type="text" id="user-search" class="form-control" placeholder="Buscar por nombre o email">
   </div>
+  <div class="row" id="user-list">
+    {% for user in users %}
+    <div class="col-md-4 mb-3 user-card" data-username="{{ user.user.username }}" data-email="{{ user.user.email }}" data-name="{{ user.first_name }} {{ user.last_name }}">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ user.user.username }}</h5>
+          <p class="card-text">
+            Nombre: {{ user.first_name }} {{ user.last_name }}<br>
+            Email: {{ user.user.email }}<br>
+          </p>
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'assign_project' user.id %}" class="btn btn-outline-primary">Añadir Proyecto</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const userSearch = document.getElementById('user-search');
+    const userList = document.getElementById('user-list');
+    const userCards = userList.getElementsByClassName('user-card');
+
+    userSearch.addEventListener('input', function() {
+      const query = userSearch.value.toLowerCase();
+      for (let card of userCards) {
+        const username = card.getAttribute('data-username').toLowerCase();
+        const email = card.getAttribute('data-email').toLowerCase();
+        const name = card.getAttribute('data-name').toLowerCase();
+        if (username.includes(query) || email.includes(query) || name.includes(query)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      }
+    });
+  });
+</script>
 {% endblock %}

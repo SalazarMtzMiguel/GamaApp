@@ -1,9 +1,21 @@
 from django.contrib import admin
-
 # Register your models here.
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from GamaApp.models import Simulation  # Cambia 'yourapp' por el nombre de tu app
+from GamaApp.models import Simulation , CustomUser, Project, Parameter, Role, RoleParameter, UserProfile, UserProject, PublicSimulation
+
+# Registrar modelos en el administrador de Django
+admin.site.register(CustomUser)
+admin.site.register(Project)
+admin.site.register(Simulation)
+admin.site.register(Parameter)
+admin.site.register(Role)
+admin.site.register(RoleParameter)
+admin.site.register(UserProfile)
+admin.site.register(UserProject)
+admin.site.register(PublicSimulation)
+
+ # Cambia 'yourapp' por el nombre de tu app
 
 # Crear grupos
 superadmin_group, _ = Group.objects.get_or_create(name='Superadministradores')

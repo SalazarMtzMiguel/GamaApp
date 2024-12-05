@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Asignar Simulaciones a {{ user.user.username }} para el Proyecto {{ project.name }}</h1>
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Simulaciones No Asignadas</h3>
+      <ul class="list-group">
+        {% for simulation in unassigned_simulations %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ simulation.name }}
+            <form method="post" class="d-inline">
+              {% csrf_token %}
+              <input type="hidden" name="simulation_id" value="{{ simulation.id }}">
+              <input type="hidden" name="action" value="assign">
+              <button type="submit" class="btn btn-success btn-sm">Asignar</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <h3>Simulaciones Asignadas</h3>
+      <ul class="list-group">
+        {% for simulation in assigned_simulations %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ simulation.name }}
+            <div>
+              <a href="{% url 'edit_simulation_parameters' user.id simulation.id %}" class="btn btn-primary btn-sm">Modificar</a>
+              <form method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="simulation_id" value="{{ simulation.id }}">
+                <input type="hidden" name="action" value="remove">
+                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

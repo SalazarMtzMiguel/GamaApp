@@ -23,13 +23,15 @@ class UserRegistrationForm(UserCreationForm):
         user.email = self.cleaned_data['email']
         if commit:
             user.save()
-            CustomUser.objects.create(
-                user=user,
-                first_name=self.cleaned_data['first_name'],
-                last_name=self.cleaned_data['last_name'],
-                maternal_last_name=self.cleaned_data.get('maternal_last_name'),
-                accepted_terms=self.cleaned_data['accepted_terms']
-            )
+            # Verifica si ya existe un CustomUser para este User
+            if not CustomUser.objects.filter(user=user).exists():
+                CustomUser.objects.create(
+                    user=user,
+                    first_name=self.cleaned_data['first_name'],
+                    last_name=self.cleaned_data['last_name'],
+                    maternal_last_name=self.cleaned_data.get('maternal_last_name'),
+                    accepted_terms=self.cleaned_data['accepted_terms']
+                )
         return user
 
 class UploadProjectForm(forms.Form):
@@ -101,3 +103,18 @@ class SelectParameterForm(forms.Form):
             except json.JSONDecodeError:
                 raise forms.ValidationError("Formato de parámetros inválido.")
         return parameters
+    
+
+class AssignProjectForm(forms.Form):
+    project = forms.ModelChoiceField(queryset=Project.objects.all(), label="Proyecto")
+
+class AssignSimulationForm(forms.Form):
+    user = forms.ModelChoiceField(queryset=CustomUser.objects.all(), label="Usuario")
+    simulation = forms.ModelChoiceField(queryset=Simulation.objects.none(), label="Simulación")
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            projects = user.projects.all()
+            self.fields['simulation'].queryset = Simulation.objects.filter(project__in=projects)
