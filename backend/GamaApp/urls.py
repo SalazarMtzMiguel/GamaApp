@@ -22,16 +22,19 @@ urlpatterns = [
     path('select_simulation/<int:project_id>/', SelectSimulationView.as_view(), name='select_simulation'),
     path('process_simulation/<int:project_id>/', ProcessSimulationView.as_view(), name='process_simulation'),
     path('select_parameters/<int:simulation_id>/', SelectParameterView.as_view(), name='select_parameters'),
-    path('run_simulation/<int:simulation_id>/', run_simulation, name='run_simulation'),
-    path('edit_simulation_parameters/<int:user_id>/<int:simulation_id>/', EditSimulationParametersView.as_view(), name='edit_simulation_parameters'),
+    path('edit_running_parameters/<int:simulation_id>/', EditRunningParametersView.as_view(), name='edit_running_parameters'),
     path('delete_simulation/', DeleteSimulationView.as_view(), name='delete_simulation'),
     path('add_project/', AddProjectView.as_view(), name='add_project'),
     path('edit_project/', ProjectListView.as_view(), name='edit_project'),
+
+    path('edit_simulation_parameters/<int:user_id>/<int:simulation_id>/', EditSimulationParametersView.as_view(), name='edit_simulation_parameters'),
     path('edit_project/<int:pk>/', EditProjectView.as_view(), name='edit_project_detail'),
     path('delete_project/', ProjectListView.as_view(), name='delete_project'),
     path('confirm_delete_project/<int:pk>/', DeleteProjectView.as_view(), name='confirm_delete_project'),
     path('project_simulation_list/', ProjectSimulationListView.as_view(), name='project_simulation_list'),
     path('edit_simulation/<int:simulation_id>/', EditSimulationView.as_view(), name='edit_simulation'),
+    path('simulation_results/<int:simulation_id>/', ViewSimulationResultsView.as_view(), name='view_simulation_results'),
+    path('run_simulation/<int:simulation_id>/', RunSimulationView.as_view(), name='run_simulation'),
 ]
 
 if settings.DEBUG:

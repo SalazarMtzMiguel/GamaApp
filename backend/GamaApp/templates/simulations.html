@@ -43,7 +43,7 @@
           </h2>
           <div id="collapsePublic{{ simulation.id }}" class="accordion-collapse collapse" aria-labelledby="headingPublic{{ simulation.id }}" data-bs-parent="#publicSimulationsAccordion">
             <div class="accordion-body">
-              <a href="{% url 'run_simulation' simulation.id %}" class="btn btn-primary">Ejecutar Simulación</a>
+              <a href="{% url 'edit_running_parameters' simulation.id %}" class="btn btn-primary">Modificar Parámetros</a>
             </div>
           </div>
         </div>
@@ -73,7 +73,7 @@
               </h2>
               <div id="collapse{{ simulation.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ simulation.id }}" data-bs-parent="#accordionExample{{ item.project.id }}">
                 <div class="accordion-body">
-                  <a href="{% url 'run_simulation' simulation.id %}" class="btn btn-primary">Ejecutar Simulación</a>
+                  <a href="{% url 'edit_running_parameters' simulation.id %}" class="btn btn-primary">Modificar Parámetros</a>
                 </div>
               </div>
             </div>

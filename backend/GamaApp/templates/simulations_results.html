@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Simulation Results for {{ simulation.name }}</h1>
+<ul>
+    {% for file in result_files %}
+        <li><a href="{{ output_directory }}/{{ file }}">{{ file }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

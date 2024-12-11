@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Editar Parámetros de {{ simulation.name }}</h1>
+  <form id="simulation-form" method="post">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Parámetros Activos</h3>
+        <ul class="list-group">
+          {% for parameter in active_parameters %}
+            <li class="list-group-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <span>{{ parameter.name }}</span>
+                <input type="number" class="form-control w-25" id="parameter_{{ parameter.id }}" name="{{ parameter.variable_name }}" value="{{ parameter.value }}" min="{{ parameter.min_value }}" max="{{ parameter.max_value }}">
+              </div>
+              <small class="form-text text-muted">Rango: {{ parameter.min_value }} - {{ parameter.max_value }}</small>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <button type="button" id="run-simulation" class="btn btn-primary">Ejecutar Simulación</button>
+    </div>
+  </form>
+  <div id="simulation-results" class="mt-4">
+    <button type="button" id="view-results" class="btn btn-secondary mt-4" style="display: none;">Ver Resultados</button>
+  </div>
+</div>
+
+<script>
+  document.getElementById('run-simulation').addEventListener('click', function() {
+    const simulationId = {{ simulation.id }};
+    const form = document.getElementById('simulation-form');
+    const formData = new FormData(form);
+
+    fetch(`/run_simulation/${simulationId}/`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+      }
+    })
+    .then(response => {
+      if (response.redirected) {
+        window.location.href = response.url;
+      }
+    });
+  });
+</script>
+{% endblock %}

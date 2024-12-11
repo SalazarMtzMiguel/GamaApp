@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Resultados de la Simulación</h1>
+  <div id="simulation-results" class="mt-4">
+    <canvas id="simulationCanvas" width="800" height="600"></canvas>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const results = {{ results|safe }};
+    const canvas = document.getElementById('simulationCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dibujar los resultados de la simulación
+    results.forEach(result => {
+      ctx.fillStyle = result.color;
+      ctx.beginPath();
+      ctx.arc(result.x, result.y, 5, 0, 2 * Math.PI);
+      ctx.fill();
+    });
+  });
+</script>
+{% endblock %}

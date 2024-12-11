@@ -9,20 +9,17 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
+      - redis
     environment:
-      - POSTGRES_DB=gama_database
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=12345678
       - DATABASE_URL=postgres://admin:12345678@postgres_db:5432/gama_database
+      - DJANGO_SETTINGS_MODULE=GamaBackend.settings
     volumes:
       - ./backend/media:/app/media  # Volumen para persistir archivos subidos
       - ./backend/static:/app/static  # Volumen para archivos estáticos
+      - ./backend/simulation_results:/app/simulation_results  # Volumen para persistir resultados de simulación
+      - ./gama:/working_dir  # Volumen compartido para el script gama-headless.sh
     networks:
       - my_network
-    command: >
-      sh -c ". /app/venv/bin/activate &&
-             python manage.py migrate &&
-             gunicorn --bind 0.0.0.0:8000 GamaBackend.wsgi:application"
 
   postgres:
     image: postgres:15
@@ -39,6 +36,15 @@ services:
     networks:
       - my_network
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - my_network
+
   nginx:
     build: ./nginx
     container_name: nginx_server
@@ -49,18 +55,6 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - backend
-    networks:
-      - my_network
-
-  gama:
-    build: ./gama
-    container_name: gama_headless
-    restart: unless-stopped
-    volumes:
-      - ./gama:/working_dir
-    ports:
-      - "6868:6868"
-    command: ["-socket", "6868"]
     networks:
       - my_network
 
